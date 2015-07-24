@@ -1,0 +1,131 @@
+Like most assemblers, each NASM source line contains (unless it is a macro, a preprocessor directive or an assembler directive: see chapter 4 and chapter 6) some combination of the four fields
+
+label: instruction operands    ; comment
+
+>>>>The colon after a label is also optional.<<<<<
+
+*Pseudo−Instructions
+Pseudo−instructions are things which, though not real x86 machine instructions, are used in the instruction field anyway because that’s the most convenient place to put them. The current pseudo−instructions are DB, DW, DD, DQ, DT, DO, DY and DZ; their uninitialized counterparts RESB, RESW, RESD, RESQ, REST, RESO, RESY and RESZ; the INCBIN command, the EQU command, and the TIMES prefix.
+
+*DB and Friends: Declaring Initialized Data
+DB, DW, DD, DQ, DT, DO, DY and DZ are used, much as in MASM, to declare initialized data in the output file.
+
+*RESB and Friends: Declaring Uninitialized Data
+RESB, RESW, RESD, RESQ, REST, RESO, RESY and RESZ are designed to be used in the BSS section of a
+module: they declare uninitialized storage space. Each takes a single operand, which is the number of bytes, words, doublewords or whatever to reserve.
+
+buffer:   resb 64 ; reserve 64 bytes
+wordvar:  resw 1  ; reserve a word
+
+*INCBIN: Including External Binary Files
+INCBIN is borrowed from the old Amiga assembler DevPac: it includes a binary file verbatim into the output file. This can be handy for (for example) including graphics and sound data directly into a game executable file. It can be called in one of these three ways:
+incbin "file.dat"           ; include the whole file
+incbin "file.dat",1024      ; skip the first 1024 bytes
+incbin "file.dat",1024,512  ; skip the first 1024, and actually include at most 512
+
+*EQU: Defining Constants
+EQU defines a symbol to a given constant value: when EQU is used, the source line must contain a label. The action of EQU is to define the given label name to the value of its (only) operand. This definition is absolute, and cannot change later. So, for example,
+
+message db  ’hello, world’
+msglen  equ $−message
+
+defines msglen to be the constant 12. msglen may not then be redefined later. This is not a preprocessor definition either: the value of msglen is evaluated once, using the value of $ (see section 3.5 for an explanation of $) at the point of definition, rather than being evaluated wherever it is referenced and using the value of $ at the point of reference.
+
+*TIMES: Repeating Instructions or Data
+The TIMES prefix causes the instruction to be assembled multiple times. This is partly present as NASM’s equivalent of the DUP syntax supported by MASM–compatible assemblers, in that you can code 
+
+    zerobuf: times 64 db 0
+
+or similar things; but TIMES is more versatile than that. The argument to TIMES is not just a numeric constant, but a numeric expression, so you can do things like 
+
+    buffer: db ’hello, world’
+            times 64−$+buffer db ’ ’
+
+which will store exactly enough spaces to make the total length of buffer up to 64. Finally, TIMES can be applied to ordinary instructions, so you can code trivial unrolled loops in it:
+
+    times 100 movsb
+
+Note also that TIMES can’t be applied to macros: the reason for this is that TIMES is processed after the macro phase, which allows the argument to TIMES to contain expressions such as 64−$+buffer as above. To repeat more than one line of code, or a complex macro, use the preprocessor %rep directive.
+
+*Constants
+NASM understands four different types of constant: numeric, character, string and floating−point.
+
+**Numeric Constants
+A numeric constant is simply a number. NASM allows you to specify numbers in a variety of number bases, in a variety of ways: you can suffix H or X, D or T, Q or O, and B or Y for hexadecimal, decimal, octal and binary respectively
+
+Numeric constants can have underscores (_) interspersed to break up long strings.
+
+**Character Strings
+
+A character string consists of up to eight characters enclosed in either single quotes (’...’), double quotes ("...") or backquotes (‘...‘). Single or double quotes are equivalent to NASM, the contents of those are represented verbatim. Strings enclosed in backquotes support C−style \–escapes for special characters.
+
+\’           single quote (’)                          
+\"           double quote (")                          
+\‘           backquote (‘)                             
+\\           backslash (\)                             
+\?           question mark (?)                         
+\a           BEL (ASCII 7)                             
+\b           BS (ASCII 8)                              
+\t           TAB (ASCII 9)                             
+\n           LF (ASCII 10)                             
+\v           VT (ASCII 11)                             
+\f           FF (ASCII 12)                             
+\r           CR (ASCII 13)                             
+\e           ESC (ASCII 27)                            
+\377         Up to 3 octal digits − literal byte       
+\xFF         Up to 2 hexadecimal digits − literal byte 
+\u1234       4 hexadecimal digits − Unicode character  
+\U12345678   8 hexadecimal digits − Unicode character  
+
+**Character Constants
+A character constant consists of a string up to eight bytes long, used in an expression context. It is treated as if it was an integer.
+
+A character constant with more than one byte will be arranged with little−endian order in mind: if you code
+
+mov eax,’abcd’
+
+then the constant generated is not 0x61626364, but 0x64636261, so that if you were then to store the value into memory, it would read abcd rather than dcba. This is also the sense of character constants understood by the Pentium’s CPUID instruction.
+
+**String Constants
+String constants are character strings used in the context of some pseudo−instructions, namely the DB family and INCBIN (where it represents a filename.) They are also used in certain preprocessor directives.
+
+A string constant looks like a character constant, only longer. It is treated as a concatenation of
+maximum−size character constants for the conditions. So the following are equivalent:
+    db ’hello’             ; string constant
+    db ’h’,’e’,’l’,’l’,’o’ ; equivalent character constants
+
+**Unicode Strings
+The special operators __utf16__, __utf16le__, __utf16be__, __utf32__, __utf32le__ and __utf32be__ allows definition of Unicode strings. They take a string in UTF−8 format and converts it to UTF−16 or UTF−32, respectively. Unless the be forms are specified, the output is littleendian.
+For example:
+
+    %define u(x) __utf16__(x)
+    %define w(x) __utf32__(x)
+
+    dw u(’C:\WINDOWS’), 0       ; Pathname in UTF−16
+    dd w(‘A + B = \u206a‘), 0   ; String in UTF−32
+
+The UTF operators can be applied either to strings passed to the DB family instructions, or to character constants in an expression context.
+
+**Floating−Point Constants
+Floating−point constants are acceptable only as arguments to DB, DW, DD, DQ, DT, and DO, or as arguments to the special operators __float8__, __float16__, __float32__, __float64__, __float80m__,
+__float80e__, __float128l__, and __float128h__.
+
+The special tokens __Infinity__, __QNaN__ (or __NaN__) and __SNaN__ can be used to generate infinities, quiet NaNs, and signalling NaNs, respectively.
+
+The %use fp standard macro package contains a set of convenience macros. See section 5.3.
+
+*Expressions
+Expressions in NASM are similar in syntax to those in C. Expressions are evaluated as 64−bit integers which are then adjusted to the appropriate size.
+
+NASM supports two special tokens in expressions, allowing calculations to involve the current assembly position: the $ and $$ tokens. $ evaluates to the assembly position at the beginning of the line containing the expression; so you can code an infinite loop using JMP $. $$ evaluates to the beginning of the current section; so you can tell how far into the section you are by using ($−$$).
+
+*Local Labels
+NASM gives special treatment to symbols beginning with a period. A label beginning with a single period is treated as a local label, which means that it is associated with the previous non−local label.
+
+label nesting.
+
+NASM therefore introduces a third type of label, which is probably only useful in macro definitions: if a label begins with the special prefix ..@, then it does nothing to the local label mechanism.
+
+So just keep in mind that symbols beginning with a double period are special.
+
+stopped at page 43!
