@@ -1,0 +1,4 @@
+You should link with gcc!
+
+If you link with ld, kernel won't recognize executable file for some reason.
+It's also might help to write ELF header by hand, that it will be usable, but less in size and without redundant things, in case of linking with gcc.
