@@ -18,6 +18,7 @@ extern fopen
 extern fclose
 extern fread
 extern fwrite
+extern feof
 
 main:
         mov r14, rdi            ; argc
@@ -52,14 +53,16 @@ read_chunk:
         mov rcx, r13
         call fread
 
-        cmp rax, 0
-        je close_files_and_exit
-
         mov rdi, buf
         mov rsi, 1
         mov rdx, 512
         mov rcx, r12
         call fwrite
+
+        mov rdi, r13
+        call feof
+        cmp rax, 0
+        jne close_files_and_exit
 
         jmp read_chunk
 exit_write_file_open_error:
