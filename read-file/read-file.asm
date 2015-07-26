@@ -55,7 +55,7 @@ read_chunk:
 
         mov rdi, buf
         mov rsi, 1
-        mov rdx, 512
+        mov rdx, rax            ; write exactly number of bytes read
         mov rcx, r12
         call fwrite
 
