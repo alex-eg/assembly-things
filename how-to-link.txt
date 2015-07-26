@@ -2,3 +2,7 @@ You should link with gcc!
 
 If you link with ld, kernel won't recognize executable file for some reason.
 It's also might help to write ELF header by hand, that it will be usable, but less in size and without redundant things, in case of linking with gcc.
+
+
+also, it's possible to link with ld only, but well... it's not simple
+here's one useful SO question: http://stackoverflow.com/questions/15466232/linking-linux-x86-64-assembly-hello-world-program-with-ld-fails
