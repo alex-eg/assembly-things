@@ -3,6 +3,9 @@ You should link with gcc!
 If you link with ld, kernel won't recognize executable file for some reason.
 It's also might help to write ELF header by hand, that it will be usable, but less in size and without redundant things, in case of linking with gcc.
 
-
 also, it's possible to link with ld only, but well... it's not simple
 here's one useful SO question: http://stackoverflow.com/questions/15466232/linking-linux-x86-64-assembly-hello-world-program-with-ld-fails
+
+okay, one step further: gcc links crt0.o, that "performs any initialization work required before calling the program's main function", according to Wikipedia: https://en.wikipedia.org/wiki/Crt0
+
+And thus, argc and argv and argenv are passed as if main was just and ordinary function, and argc and argv will be in rdi and rsi respectively.
