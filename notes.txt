@@ -9,3 +9,5 @@ here's one useful SO question: http://stackoverflow.com/questions/15466232/linki
 okay, one step further: gcc links crt0.o, that "performs any initialization work required before calling the program's main function", according to Wikipedia: https://en.wikipedia.org/wiki/Crt0
 
 And thus, argc and argv and argenv are passed as if main was just and ordinary function, and argc and argv will be in rdi and rsi respectively.
+
+When you don't link with crt0, argc is on top of the stack ([rsp]), and all arguments lie after argc, each one is 8-byte pointer.
