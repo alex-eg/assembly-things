@@ -1,5 +1,15 @@
 *
 
+!/hello
+!/hello-syscall
+!/print-argv
+!/print-argv-syscalls
+!/read-file
+!/read-memory
+!/segfault
+!/targa-gen
+
 !.gitignore
 !*.asm
 !*.txt
+!/*/Makefile
