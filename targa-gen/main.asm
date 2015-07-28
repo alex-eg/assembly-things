@@ -37,7 +37,6 @@ _start:
         cmp rax, -1
         je .exit_open_file_error
 
-..@a0:
         mov rdi, r12            ; opened file
         mov rsi, [width]
         mov rdx, [height]

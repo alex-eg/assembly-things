@@ -51,13 +51,11 @@ write_targa:
         write_data r12, image_descriptor, 1
 
         mov rax, r13
-b1:
         mul r14
         mov r14, 3
         mul r14
-b2:
         mov rbx, rax
-b3:
+
         write_data r12, r15, rbx
         write_data r12, footer, 26
 
