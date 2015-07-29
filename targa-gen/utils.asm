@@ -5,7 +5,7 @@
 
 section .text
 
-global chunck_length
+global chunk_length
 global print
 global open_file
 global close_file
