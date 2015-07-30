@@ -46,15 +46,15 @@ _start:
         push rcx
 
         mov rcx, 0              ; offset
-        mov rax, 0              ; qwords
+        mov rax, 6144           ; qwords
 .fill_image:
         xor rbx, rbx
-        mov rbx, 888
-        lea rcx, [image + rax]
-        mov [rcx], bx
+        mov rbx, 0xFFFFFFFF
+        lea rcx, [image + 8 * rax]
+        mov [rcx], rbx
 
-        inc rax
-        cmp rax, 2
+        dec rax
+        cmp rax, 0
 ..@break:
         jg .fill_image
 
