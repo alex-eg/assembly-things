@@ -40,6 +40,28 @@ _start:
         mov rdi, r12            ; opened file
         mov rsi, [width]
         mov rdx, [height]
+
+        push rax
+        push rbx
+        push rcx
+
+        mov rcx, 0              ; offset
+        mov rax, 6144           ; qwords
+.fill_image:
+
+        mov rbx, 8
+        lea rcx, [image + rax]
+        mov [rcx], rbx
+
+        dec rax
+        cmp rax, 0
+..@break:
+        jg .fill_image
+
+        pop rcx
+        pop rbx
+        pop rax
+
         mov rcx, image
 
         call write_targa
