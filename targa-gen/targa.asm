@@ -20,7 +20,7 @@ header:   db 0,0,2,0,0,0,0,0
 x_origin: db 0,0
 y_origin: db 0,0
 depth:    db 24
-image_descriptor: db 00_00_0000b
+image_descriptor: db 00_11_0000b
 
 footer: db 0,0,0,0,0,0,0,0, "TRUEVISION-XFILE.", 0
 
