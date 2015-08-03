@@ -49,7 +49,7 @@ _start:
         mov rax, 6144           ; qwords
 .fill_image:
         xor rbx, rbx
-        mov rbx, 0xFFFFFFFF
+        mov rbx, 0x000FFF00
         lea rcx, [image + 8 * rax]
         mov [rcx], rbx
 
