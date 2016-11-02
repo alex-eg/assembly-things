@@ -1,5 +1,6 @@
 *
 
+!/floating-point
 !/hello
 !/hello-syscall
 !/print-argv
